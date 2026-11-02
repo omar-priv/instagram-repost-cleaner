@@ -123,8 +123,11 @@ class MainActivity : Activity() {
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: ConsoleMessage): Boolean {
-                if (message.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-                    statusText.text = "خطأ في تشغيل واجهة الأداة: ${message.message()}"
+                // Instagram itself emits cross-origin/CORS console errors for Facebook endpoints.
+                // They are unrelated to our injected cleaner and must not be shown as cleaner failures.
+                if (message.messageLevel() == ConsoleMessage.MessageLevel.ERROR &&
+                    message.sourceId().contains("cleaner.js", ignoreCase = true)) {
+                    statusText.text = "خطأ داخل محرك الأداة: ${message.message()}"
                 }
                 return true
             }
