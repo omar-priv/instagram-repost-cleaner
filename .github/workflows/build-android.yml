@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     paths:
-      - '.build/android-project.tar.gz.b64'
+      - '.build/source-*.b64'
       - '.github/workflows/build-android.yml'
   workflow_dispatch:
 
@@ -21,8 +21,7 @@ jobs:
 
       - name: Restore Android project source
         run: |
-          mkdir -p .build
-          base64 --decode .build/android-project.tar.gz.b64 | tar -xz
+          cat .build/source-*.b64 | base64 --decode | tar -xz
           test -f android/RepostCleaner/app/src/main/java/com/repostcleaner/app/MainActivity.kt
           test -f android/RepostCleaner/app/src/main/assets/cleaner.js
 
