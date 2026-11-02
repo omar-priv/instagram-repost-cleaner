@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repost Cleaner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="mark">↗</div>
+      <div><h1>Repost Cleaner</h1><p>معاينة أولاً · إزالة تدريجية ومحافظة</p></div>
+    </header>
+    <section class="notice">
+      <strong>قبل التشغيل</strong>
+      <p>افتح ملفك الشخصي ← Reposts ← افتح أول منشور. افحص حتى 200 عنصر بدون حذف، راجع المعاينة، ثم اختر عدد المحاولات.</p>
+    </section>
+    <section class="stats">
+      <div><b id="scanned">0 / 200</b><small>عناصر تم فحصها</small></div>
+      <div><b id="done">0</b><small>محاولات واجهة</small></div>
+    </section>
+    <div class="preview-head"><b>المعاينة</b><span id="previewCount">لم يبدأ الفحص</span></div>
+    <div class="preview" id="preview">ستظهر هنا معرّفات أول 20 Repost بعد الفحص.</div>
+    <button id="scan" class="scan">افحص Reposts حتى 200</button>
+    <label for="limit">عدد Reposts المراد محاولة إزالتها</label>
+    <input id="limit" type="number" min="1" max="200" value="5">
+    <p id="eta" class="eta">الوقت التقريبي يظهر بعد الفحص (انتظار الاستقرار فقط).</p>
+    <div class="actions">
+      <button id="start" class="primary" disabled>ابدأ الإزالة</button>
+      <button id="pause" class="pause" disabled>إيقاف مؤقت</button>
+      <button id="stop" class="stop" disabled>إيقاف نهائي</button>
+      <button id="open" class="secondary">افتح صفحة Reposts</button>
+      <button id="export" class="export" disabled>تصدير CSV</button>
+    </div>
+    <p id="status" class="status" role="status">افتح أول Repost داخل Instagram ثم نفّذ الفحص.</p>
+    <footer>محلي ومفتوح المصدر · لا يقرأ كلمة السر أو الكوكيز ولا يرسل بيانات لخادم. أي تحذير أو قيد يوقف التشغيل.</footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
