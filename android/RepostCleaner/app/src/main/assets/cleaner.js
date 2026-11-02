@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   if (window.__IGRC_BOOTED__) return;
-  window.__IGRC_BOOTED__ = true;
+  document.getElementById('igrc-mobile-panel')?.remove();
 
   const VERSION = '1.0.0';
   const MAX_SCAN = 200;
@@ -538,4 +538,7 @@
       if (message?.type === 'IGRC_EXPORT_CSV') { exportCSV(); sendResponse({ ok: true }); return; }
     });
   }
+
+  // Mark booted only after the complete panel and public API are ready.
+  window.__IGRC_BOOTED__ = true;
 })();
