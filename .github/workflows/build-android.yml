@@ -1,10 +1,12 @@
 name: Build Android APK
+# Rebuild after Android WebView injection fix
 
 on:
   push:
     paths:
       - '.build/source-v1-*.b64'
       - '.github/workflows/build-android.yml'
+      - 'android/RepostCleaner/app/src/main/**'
   workflow_dispatch:
 
 permissions:
@@ -23,9 +25,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .build/source-v1-*.b64 | base64 --decode > /tmp/repost-cleaner-source.tar.gz
-          tar -tzf /tmp/repost-cleaner-source.tar.gz >/dev/null
-          tar -xzf /tmp/repost-cleaner-source.tar.gz
+          if [ ! -f android/RepostCleaner/app/src/main/java/com/repostcleaner/app/MainActivity.kt ]; then
+            cat .build/source-v1-*.b64 | base64 --decode > /tmp/repost-cleaner-source.tar.gz
+            tar -tzf /tmp/repost-cleaner-source.tar.gz >/dev/null
+            tar -xzf /tmp/repost-cleaner-source.tar.gz
+          fi
           test -f android/RepostCleaner/app/src/main/java/com/repostcleaner/app/MainActivity.kt
           test -f android/RepostCleaner/app/src/main/assets/cleaner.js
           test -f chrome-extension/content.js
