@@ -200,7 +200,7 @@ class MainActivity : Activity() {
             webView.evaluateJavascript(
                 "(!!(window.RepostCleaner && document.getElementById('igrc-mobile-panel'))).toString()"
             ) { ready ->
-                if (ready == '"true"') {
+                if (ready == "\"true\"") {
                     statusText.text = "الأداة جاهزة · افتح ملفك الشخصي ثم تبويب Reposts"
                 } else if (attempt < 4) {
                     statusText.text = "جاري تهيئة واجهة الأداة (${attempt + 1}/5)…"
