@@ -6,6 +6,7 @@ on:
     paths:
       - '.build/source-v1-*.b64'
       - '.github/workflows/build-android.yml'
+      - 'android/RepostCleaner/app/src/main/**'
   workflow_dispatch:
 
 permissions:
