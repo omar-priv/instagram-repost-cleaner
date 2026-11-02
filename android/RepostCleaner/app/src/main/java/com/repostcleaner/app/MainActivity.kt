@@ -8,10 +8,13 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.ConsoleMessage
 import android.webkit.SafeBrowsingResponse
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -31,6 +34,7 @@ class MainActivity : Activity() {
     private lateinit var webView: WebView
     private lateinit var progress: ProgressBar
     private lateinit var statusText: TextView
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     companion object {
         private const val HOME = "https://www.instagram.com/"
@@ -117,7 +121,14 @@ class MainActivity : Activity() {
             setGeolocationEnabled(false)
         }
 
-        webView.webChromeClient = WebChromeClient()
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                if (message.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+                    statusText.text = "خطأ في تشغيل واجهة الأداة: ${message.message()}"
+                }
+                return true
+            }
+        }
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url
@@ -140,7 +151,7 @@ class MainActivity : Activity() {
                 val uri = runCatching { Uri.parse(url ?: "") }.getOrNull()
                 if (uri != null && isInstagramHost(uri.host)) {
                     injectCleaner()
-                    statusText.text = "جلسة WebView مستقلة · افتح ملفك الشخصي ثم Reposts"
+                    statusText.text = "تم تحميل Instagram داخل التطبيق؛ جاري التحقق من واجهة الأداة…"
                 } else {
                     statusText.text = "تم فتح صفحة خارج Instagram في المتصفح الخارجي."
                 }
@@ -174,15 +185,31 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun injectCleaner() {
+    private fun injectCleaner(attempt: Int = 0) {
+        val currentUri = runCatching { Uri.parse(webView.url ?: "") }.getOrNull()
+        if (currentUri == null || !isInstagramHost(currentUri.host)) return
+
         val script = runCatching {
             assets.open("cleaner.js").bufferedReader(Charsets.UTF_8).use { it.readText() }
         }.getOrElse {
             statusText.text = "تعذر تحميل محرك الأداة المحلي."
             return
         }
-        // The script is bundled in the APK and is injected only into an Instagram HTTPS origin.
-        webView.evaluateJavascript(script, null)
+
+        webView.evaluateJavascript(script) {
+            webView.evaluateJavascript(
+                "(!!(window.RepostCleaner && document.getElementById('igrc-mobile-panel'))).toString()"
+            ) { ready ->
+                if (ready == '"true"') {
+                    statusText.text = "الأداة جاهزة · افتح ملفك الشخصي ثم تبويب Reposts"
+                } else if (attempt < 4) {
+                    statusText.text = "جاري تهيئة واجهة الأداة (${attempt + 1}/5)…"
+                    mainHandler.postDelayed({ injectCleaner(attempt + 1) }, 900)
+                } else {
+                    statusText.text = "تعذر تشغيل واجهة الأداة. حدّث Android System WebView ثم أعد فتح التطبيق."
+                }
+            }
+        }
     }
 
     private fun nativeStop(reason: String) {
