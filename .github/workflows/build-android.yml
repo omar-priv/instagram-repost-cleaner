@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-debug-apk:
@@ -29,6 +29,13 @@ jobs:
           test -f android/RepostCleaner/app/src/main/java/com/repostcleaner/app/MainActivity.kt
           test -f android/RepostCleaner/app/src/main/assets/cleaner.js
           test -f chrome-extension/content.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android chrome-extension scripts README-AR.md REVIEW-2.1.0-AR.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Restore source files for Android repair"
+            git push origin HEAD:repair/android-source-inspection
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
